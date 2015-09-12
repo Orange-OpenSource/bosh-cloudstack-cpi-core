@@ -1,4 +1,4 @@
-package com.orange.oss.cloudfoundry.cscpi;
+package com.orange.oss.cloudfoundry.cscpi.config;
 
 
 import java.util.Properties;
@@ -26,20 +26,64 @@ public class CloudStackConfiguration {
 	
 	
 	@Value("${cloudstack.endpoint}")	
-	String endpoint;
+	public String endpoint;
 
 	@Value("${cloudstack.api_key}")	
-	String api_key;
+	public  String api_key;
 
 	@Value("${cloudstack.secret_access_key}")	
-	String secret_access_key;
+	public  String secret_access_key;
 
 	@Value("${cloudstack.default_key_name}")	
-	String default_key_name;
+	public String default_key_name;
 
 	@Value("${cloudstack.private_key}")	
-	String private_key;
+	public String private_key;
 
+
+	
+	@Value("${cloudstack.proxy_host}")	
+	public String proxy_host;
+
+	@Value("${cloudstack.proxy_port}")	
+	public String proxy_port;
+
+	@Value("${cloudstack.proxy_user}")	
+	public String proxy_user;
+
+	@Value("${cloudstack.proxy_password}")	
+	public String proxy_password;
+
+	@Value("${cloudstack.state_timeout}")	
+	public int state_timeout;
+
+	@Value("${cloudstack.state_timeout_volume}")	
+	public int state_timeout_volume;
+
+	@Value("${cloudstack.stemcell_public_visibility}")	
+	public boolean stemcell_public_visibility;
+
+	@Value("${cloudstack.default_zone}")	
+	public String  default_zone;
+	
+	@Value("${cpi.mock_create_stemcell}")
+	public boolean mockCreateStemcell;
+
+	
+	@Value("${cpi.vm_expunge_delay}")
+	public int vmExpungeDelaySeconds;
+	
+	//initial preexisting template (to mock stemcell upload before template generation)
+	@Value("${cpi.existing_template_name}")
+	public String existingTemplateName;
+	
+	
+	
+	@Value("${cpi.default_disk_offering}")
+	public String defaultDiskOffering;
+
+	@Value("${cpi.default_ephemeral_disk_offering}")	
+	public String defaultEphemeralDiskOffering;
 	
 	
 	@Bean
@@ -62,7 +106,7 @@ public class CloudStackConfiguration {
         overrides.setProperty(Constants.PROPERTY_TRUST_ALL_CERTS, "true");
 
         //see https://raw.githubusercontent.com/abayer/cloudcat/master/src/groovy/cloudstack/reporting/JCloudsConnection.groovy
-        overrides.setProperty(Constants.PROPERTY_CONNECTION_TIMEOUT, "360000");
+        overrides.setProperty(Constants.PROPERTY_CONNECTION_TIMEOUT, "5000");
         overrides.setProperty(Constants.PROPERTY_TIMEOUTS_PREFIX + "VirtualMachineClient", "360000");
         overrides.setProperty(Constants.PROPERTY_TIMEOUTS_PREFIX + "TemplateClient", "360000");
         overrides.setProperty(Constants.PROPERTY_TIMEOUTS_PREFIX + "GlobalHostClient", "360000");
@@ -71,6 +115,17 @@ public class CloudStackConfiguration {
         overrides.setProperty(Constants.PROPERTY_TIMEOUTS_PREFIX + "AlertClient", "360000");
         overrides.setProperty(Constants.PROPERTY_TIMEOUTS_PREFIX + "GlobalAccountClient", "360000");
         overrides.setProperty(Constants.PROPERTY_TIMEOUTS_PREFIX + "AccountClient", "360000");
+
+		if (proxy_host.length() > 0) {
+			logger.info("using proxy {}:{} with user {}", proxy_host,proxy_port, proxy_user);
+
+			overrides.setProperty(Constants.PROPERTY_PROXY_HOST, proxy_host);
+			overrides.setProperty(Constants.PROPERTY_PROXY_PORT, proxy_port);
+			overrides.setProperty(Constants.PROPERTY_PROXY_USER, proxy_user);
+			overrides.setProperty(Constants.PROPERTY_PROXY_PASSWORD,
+					proxy_password);
+		}
+	
         overrides.setProperty("jclouds.retries-delay-start", "1000");
         
         
@@ -81,6 +136,9 @@ public class CloudStackConfiguration {
                 .modules(modules)
                 .overrides(overrides)
                 .buildApi(CloudStackApi.class);
+        
+        
+        
         return api;
 
 	}

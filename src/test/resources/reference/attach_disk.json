@@ -1,0 +1,10 @@
+{
+   "method":"attach_disk",
+   "arguments":[
+      "cpivm-172775c3-4df7-4ccd-8661-0310aee117c8",
+      "cpi-disk-873adfd4-c44f-434d-96d3-c39996fd13d7"
+   ],
+   "context":{
+      "director_uuid":"f8891348-b92d-4a67-9f74-c0db05005f40"
+   }
+}

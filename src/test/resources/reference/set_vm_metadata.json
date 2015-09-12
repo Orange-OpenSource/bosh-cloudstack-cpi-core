@@ -1,0 +1,13 @@
+{
+   "method":"set_vm_metadata",
+   "arguments":[
+      "cpivm-db877da4-1c81-471d-be75-9ae9654035be",
+      {
+         "director":"bosh-master-dfy-qa",
+         "deployment":"concourse"
+      }
+   ],
+   "context":{
+      "director_uuid":"f8891348-b92d-4a67-9f74-c0db05005f40"
+   }
+}

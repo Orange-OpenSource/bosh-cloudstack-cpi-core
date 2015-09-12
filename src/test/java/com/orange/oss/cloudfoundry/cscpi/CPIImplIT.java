@@ -1,6 +1,6 @@
 package com.orange.oss.cloudfoundry.cscpi;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,14 +14,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.orange.oss.cloudfoundry.cscpi.domain.Network;
+import com.orange.oss.cloudfoundry.cscpi.domain.Networks;
+import com.orange.oss.cloudfoundry.cscpi.domain.ResourcePool;
+import com.orange.oss.cloudfoundry.cscpi.exceptions.CpiErrorException;
+import com.orange.oss.cloudfoundry.cscpi.exceptions.VMCreationFailedException;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = BoshCloudstackCpiCoreApplication.class)
 @ConfigurationProperties
 
-public class CPIImplITTest {
+public class CPIImplIT {
 
 	
 	@Autowired
@@ -31,16 +35,25 @@ public class CPIImplITTest {
 	
 	
 	@Test
-	public void testCreate_vm() {
+	public void testCreate_vm() throws VMCreationFailedException, CpiErrorException {
 		//should be template Id
-		String agent_id="xxxxx";
+		String agent_id="123456789";
 		
 		//TODO: add stemcell generation step = template creation
-		String stemcell_id="fed01f08-f4f6-11e4-a7e9-0800270c9aa5";
+		//String stemcell_id="Ubuntu Trusty amd64 [2015-06-01]"; //ubuntu precise template";
+		String stemcell_id="cpitemplate-601";
 		
+		ResourcePool resource_pool=new ResourcePool();
+		resource_pool.compute_offering="CO1 - Small STD";
+		resource_pool.disk=8192;
 		
-		JsonNode resource_pool=null;
-		JsonNode networks=null;		
+		Networks networks=new Networks();
+		Network net=new Network();
+		networks.networks.put("default", net);		
+		net.ip="192.168.0.1";
+		net.gateway="192.168.0.254";
+		net.netmask="255.255.255.0";
+		net.cloud_properties.put("", "");
 		List<String> disk_locality=new ArrayList<String>();
 		Map<String, String> env=new HashMap<String, String>();
 		
@@ -51,10 +64,6 @@ public class CPIImplITTest {
 		cpi.delete_vm(vm_id);
 	}
 
-	@Test
-	public void testInitialize() {
-		fail("Not yet implemented");
-	}
 
 	@Test
 	public void testCurrent_vm_id() {
@@ -62,13 +71,12 @@ public class CPIImplITTest {
 	}
 
 	@Test
-	public void testCreate_stemcell() {
+	public void testCreate_stemcell() throws CpiErrorException {
 		
 		Map<String, String> cloud_properties=new HashMap<String, String>();
-		String image_path="/tmp/";
+		String image_path="/tmp/image.vhd";
 		String stemcell=this.cpi.create_stemcell(image_path, cloud_properties);
-		assertTrue("fed01f08-f4f6-11e4-a7e9-0800270c9aa5".equals(stemcell));
-		
+		//TODO: clean stemcell
 	}
 
 	@Test

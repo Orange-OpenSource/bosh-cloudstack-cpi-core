@@ -1,0 +1,13 @@
+{
+   "method":"create_disk",
+   "arguments":[
+      1024,
+      {
+         "disk_offering":"DO2 - Medium STD"
+      },
+      "cpivm-172775c3-4df7-4ccd-8661-0310aee117c8"
+   ],
+   "context":{
+      "director_uuid":"f8891348-b92d-4a67-9f74-c0db05005f40"
+   }
+}

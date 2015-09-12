@@ -3,7 +3,11 @@ package com.orange.oss.cloudfoundry.cscpi;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.orange.oss.cloudfoundry.cscpi.domain.Networks;
+import com.orange.oss.cloudfoundry.cscpi.domain.ResourcePool;
+import com.orange.oss.cloudfoundry.cscpi.exceptions.CpiErrorException;
+import com.orange.oss.cloudfoundry.cscpi.exceptions.NotSupportedException;
+import com.orange.oss.cloudfoundry.cscpi.exceptions.VMCreationFailedException;
 
 /**
  *
@@ -71,24 +75,20 @@ public interface CPI {
 	 * @param disk_locality
 	 * @param env
 	 * @return
+	 * @throws VMCreationFailedException 
 	 */
 	String create_vm(String agent_id, String stemcell_id,
-			JsonNode resource_pool, JsonNode networks,
-			List<String> disk_locality, Map<String, String> env);
+			ResourcePool resource_pool, Networks networks,
+			List<String> disk_locality, Map<String, String> env) throws VMCreationFailedException;
 	
 	
-
-	/**
-	 * Cloud initialization
-	 * @param [Hash] options cloud options  
-	 */
-	void initialize(Map<String,String> options);
 	
 	
 	/**
 	 * Get the vm_id of this host
 	 * @return [String] opaque id later used by other methods of the CPI 
 	 */
+	@Deprecated
     String current_vm_id();
 
 	
@@ -98,8 +98,9 @@ public interface CPI {
 	 @param [Hash] cloud_properties properties required for creating this template
 	               specific to a CPI
 	@return [String] opaque id later used by {#create_vm} and {#delete_stemcell}
+	 * @throws CpiErrorException 
 	 */
-    String create_stemcell(String image_path, Map<String,String>cloud_properties);
+    String create_stemcell(String image_path, Map<String,String>cloud_properties) throws CpiErrorException;
     
     
     
@@ -124,8 +125,9 @@ public interface CPI {
     def delete_vm(vm_id)
       not_implemented(:delete_vm)
     end
+ * @throws CpiErrorException 
 **/
-   void delete_vm(String vm_id); 
+   void delete_vm(String vm_id) throws CpiErrorException; 
 	
 	/**
 	 * 
@@ -206,9 +208,10 @@ public interface CPI {
     def configure_networks(vm_id, networks)
       not_implemented(:configure_networks)
     end
+ * @throws NotSupportedException 
     * 
     */
-   void configure_networks(String vm_id,JsonNode networks);
+   void configure_networks(String vm_id,Networks networks) throws NotSupportedException;
    
    
    
